@@ -30,6 +30,12 @@ module BetterErrors
       binding.eval(self.class.template(template_name).src)
     end
 
+    def do_console(opts)
+      index = opts["index"].to_i
+      @frame = backtrace_frames[index]
+      { html: render("console") }
+    end
+
     def do_variables(opts)
       index = opts["index"].to_i
       @frame = backtrace_frames[index]

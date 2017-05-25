@@ -935,7 +935,7 @@
                 return switchTo(el);
             }
 
-            apiCall("variables", { "index": index }, function(response) {
+            apiCall("console", { "index": index }, function(response) {
                 el.loaded = true;
                 if(response.error) {
                     el.innerHTML = "<h2 class='error'>" + escapeHTML(response.error) + "</h2>";
@@ -944,7 +944,13 @@
                     }
                     el.innerHTML += "<p><a target='_new' href='https://github.com/charliesome/better_errors'>More about Better Errors</a></p>";
                 } else {
-                    el.innerHTML = response.html;
+                    el.innerHTML = response.html + '\n<div class="var_info" id="var_info_'+ index + '">\n' +
+                            '<a class="show_vars" data-index="' + index + '" href="#">Show variable values</a>\n</div>';
+
+                    var link = el.querySelector("a.show_vars");
+                    link.onclick = function() {
+                        showValues(link.attributes["data-index"].value);
+                    };
 
                     var repl = el.querySelector(".repl .console");
                     if(repl) {
@@ -952,6 +958,21 @@
                     }
                 }
                 switchTo(el);
+            });
+        }
+    }
+
+    function showValues(index) {
+        var el = document.querySelector("#var_info_" + index);
+        if (el && !el.loaded) {
+            el.innerHTML = "loading...";
+            apiCall("variables", { "index": index }, function(response) {
+                el.loaded = true;
+                if(response.error) {
+                    el.innerHTML = "<span class='error'>" + escapeHTML(response.error) + "</span>";
+                } else {
+                    el.innerHTML = response.html;
+                }
             });
         }
     }
